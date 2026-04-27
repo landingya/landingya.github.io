@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Universidad Continental del Futuro — Admisiones 2025</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    /* === VARIABLES === */
+    :root {
+      --navy:        #0A1628;
+      --navy-dark:   #060E1C;
+      --navy-mid:    #0F1E35;
+      --gold:        #F0A500;
+      --gold-light:  #FFD166;
+      --white:       #FFFFFF;
+      --text-muted:  #8899AA;
+      --surface:     rgba(255, 255, 255, 0.04);
+      --border:      rgba(240, 165, 0, 0.18);
+      --font-display: "Playfair Display", serif;
+      --font-body:    "Lato", sans-serif;
+      --transition:   0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      --radius:       16px;
+    }
+
+    /* === RESET === */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: radial-gradient(circle at 15% 20%, rgba(240, 165, 0, 0.08), transparent 30%), var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; color: inherit; }
+
+    /* === COMPONENTES GLOBALES === */
+    .section-header {
+      max-width: 1100px;
+      margin: 0 auto 40px;
+      text-align: center;
+    }
+    .section-tag {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1.7;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .text-gold { color: var(--gold); }
+
+    /* === NAVBAR === */
+    #navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      transition: background var(--transition), box-shadow var(--transition);
+    }
+    #navbar.scrolled {
+      background: rgba(10, 22, 40, 0.88);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 1px 0 rgba(240, 165, 0, 0.1);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 32px;
+      gap: 16px;
+    }
+    .nav-logo { flex-shrink: 0; }
+    .logo-sigla {
+      color: var(--gold);
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 900;
+      display: block;
+      line-height: 1;
+    }
+    .logo-nombre {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 2px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--white);
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .btn-nav {
+      background: var(--gold);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 24px;
+      border-radius: 100px;
+      transition: transform var(--transition), filter var(--transition);
+      white-space: nowrap;
+    }
+    .btn-nav:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+    }
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .nav-mobile {
+      display: none;
+      flex-direction: column;
+      background: var(--navy-dark);
+      padding: 20px 32px;
+      gap: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .nav-mobile.open { display: flex; }
+    .nav-mobile a {
+      font-size: 16px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .btn-nav-mobile {
+      background: var(--gold);
+      color: var(--navy);
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 100px;
+      text-align: center;
+      margin-top: 8px;
+      border-bottom: none;
+    }
+
+    /* === HERO === */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 32px 80px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: url("https://picsum.photos/1920/1080?random=10") center/cover no-repeat;
+      filter: blur(3px) brightness(0.5);
+      transform: scale(1.05);
+      animation: slow-pan 18s ease-in-out infinite alternate;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(10, 22, 40, 0.95) 0%, rgba(10, 22, 40, 0.7) 100%);
+    }
+    .hero-content {
+      position: relative;
+      max-width: 700px;
+      z-index: 1;
+    }
+    .hero-badge {
+      display: inline-block;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 16px;
+    }
+    .hero-ciudad {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      min-height: 18px;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .hero-clima {
+      font-size: 15px;
+      color: var(--gold-light);
+      margin-bottom: 36px;
+      min-height: 22px;
+    }
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: var(--navy);
+      font-weight: 700;
+      padding: 16px 32px;
+      border-radius: 100px;
+      transition: transform var(--transition), filter var(--transition);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.03);
+      filter: brightness(1.08);
+    }
+    .btn-outline {
+      border: 2px solid var(--gold);
+      color: var(--gold);
+      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 100px;
+      transition: background var(--transition), color var(--transition);
+    }
+    .btn-outline:hover {
+      background: var(--gold);
+      color: var(--navy);
+    }
+    .hero-stats {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .hero-stat { display: flex; flex-direction: column; }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .stat-sep {
+      color: var(--gold);
+      font-size: 24px;
+      opacity: 0.4;
+    }
+
+    /* === CARRERAS === */
+    .carreras-section {
+      padding: 100px 32px;
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .buscador-wrap {
+      position: relative;
+      max-width: 480px;
+      margin: 0 auto 48px;
+    }
+    .buscador-wrap input {
+      width: 100%;
+      background: var(--navy-mid);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 14px 20px 14px 48px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 15px;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .buscador-wrap input:focus { border-color: var(--gold); }
+    .buscador-wrap input::placeholder { color: var(--text-muted); }
+    .buscador-wrap .icon-lupa {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+    .carreras-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .carrera-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px 28px;
+      cursor: pointer;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+    .carrera-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--gold);
+      box-shadow: 0 8px 32px rgba(240, 165, 0, 0.15);
+    }
+    .carrera-card .icono {
+      font-size: 36px;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .carrera-card h3 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    .carrera-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .carrera-card .ver-mas {
+      font-size: 13px;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    /* === ADMISION DNI === */
+    .admision-section {
+      padding: 100px 32px;
+      background: var(--navy-dark);
+    }
+    .admision-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      max-width: 1100px;
+      margin: 0 auto;
+      align-items: start;
+    }
+    .admision-info h2 {
+      font-family: var(--font-display);
+      font-size: clamp(30px, 5vw, 42px);
+      margin-bottom: 16px;
+    }
+    .admision-info p {
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: var(--navy-mid);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 14px;
+      outline: none;
+      transition: border-color var(--transition);
+      resize: vertical;
+      min-height: 46px;
+    }
+    .form-group textarea { min-height: 100px; }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--gold); }
+    .form-group input[readonly] { opacity: 0.7; cursor: not-allowed; }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: var(--text-muted); }
+    select option { background: var(--navy); }
+    .dni-status {
+      font-size: 12px;
+      margin-top: 4px;
+      min-height: 16px;
+    }
+    .dni-status.loading { color: var(--gold-light); }
+    .dni-status.success { color: #4ade80; }
+    .dni-msg {
+      display: none;
+      background: rgba(74, 222, 128, 0.08);
+      border: 1px solid rgba(74, 222, 128, 0.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #4ade80;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .btn-submit {
+      width: 100%;
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      border-radius: 100px;
+      padding: 16px;
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform var(--transition), filter var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .form-success {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--navy);
+      font-weight: 900;
+    }
+    .form-success h3 {
+      font-family: var(--font-display);
+      font-size: 24px;
+    }
+    .form-success p {
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* === ESTADISTICAS === */
+    .stats-section {
+      padding: 80px 32px;
+      background: var(--gold);
+      color: var(--navy);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .stat-item i {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+    .stat-item .count {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .stat-item span:last-child {
+      font-size: 14px;
+      font-weight: 700;
+      opacity: 0.75;
+    }
+
+    /* === POR QUE ELEGIRNOS === */
+    .why-section {
+      padding: 100px 32px;
+      background: var(--navy);
+    }
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .why-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 44px 30px;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+    .why-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--gold);
+      box-shadow: 0 10px 40px rgba(240, 165, 0, 0.12);
+    }
+    .why-card i {
+      font-size: 42px;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+    .why-card h3 {
+      font-family: var(--font-display);
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .why-card p {
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* === TESTIMONIOS === */
+    .testimonios-section {
+      padding: 100px 32px;
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.01);
+    }
+    .carousel-wrapper {
+      position: relative;
+      overflow: hidden;
+      max-width: 1000px;
+      margin: 40px auto 0;
+    }
+    #testimonios-track {
+      display: flex;
+      transition: transform 0.5s ease;
+      will-change: transform;
+    }
+    .testimonio-card {
+      min-width: 100%;
+      padding: 40px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      text-align: center;
+    }
+    .testimonio-card img,
+    .avatar-inicial {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      object-fit: cover;
+    }
+    .avatar-inicial {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gold);
+      color: var(--navy);
+      font-size: 32px;
+      font-weight: 900;
+    }
+    .stars {
+      color: var(--gold);
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+    .testimonio-card p {
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+    .testimonio-card strong {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .testimonio-card span {
+      font-size: 13px;
+      color: var(--gold);
+    }
+    #carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 24px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      border: none;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .dot.active {
+      background: var(--gold);
+      transform: scale(1.3);
+    }
+
+    /* === MAPA === */
+    .mapa-section {
+      padding: 100px 32px;
+      background: var(--navy-dark);
+    }
+    .mapa-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    #mapa-ucf {
+      height: 420px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    /* === FORMULARIO FINAL === */
+    .final-form-section {
+      padding: 100px 32px;
+      background: linear-gradient(180deg, var(--navy) 0%, var(--navy-dark) 100%);
+    }
+    .final-form-wrap {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .form-note {
+      margin-top: 14px;
+      color: var(--text-muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* === FOOTER === */
+    footer {
+      background: var(--navy-dark);
+      border-top: 1px solid rgba(240, 165, 0, 0.12);
+      padding: 70px 32px 0;
+    }
+    .footer-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
+      padding-bottom: 40px;
+    }
+    .footer-col h4 {
+      font-family: var(--font-display);
+      color: var(--gold-light);
+      margin-bottom: 14px;
+      font-size: 19px;
+    }
+    .footer-col p,
+    .footer-col a,
+    .footer-col li {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .footer-col ul {
+      list-style: none;
+      display: grid;
+      gap: 6px;
+    }
+    .footer-col a { transition: color var(--transition); }
+    .footer-col a:hover { color: var(--gold); }
+    .social-links {
+      display: flex;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .social-links a {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      transition: color var(--transition), border-color var(--transition), transform var(--transition);
+    }
+    .social-links a:hover {
+      color: var(--gold);
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+    .footer-contact li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .footer-contact i {
+      color: var(--gold);
+      margin-top: 5px;
+      width: 16px;
+      text-align: center;
+    }
+    .footer-bottom {
+      border-top: 1px solid rgba(240, 165, 0, 0.12);
+      padding: 20px 0;
+      text-align: center;
+    }
+    .footer-bottom p {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* === WHATSAPP FLOTANTE === */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 60px;
+      height: 60px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: white;
+      z-index: 999;
+      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+      transition: transform var(--transition);
+    }
+    .whatsapp-float:hover { transform: scale(1.1); }
+    .whatsapp-float::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #25D366;
+      animation: pulse-wa 2s infinite;
+      z-index: -1;
+    }
+    @keyframes pulse-wa {
+      0% { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    /* === ANIMACIONES GLOBALES === */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    @keyframes slow-pan {
+      0% { transform: scale(1.05) translateX(0); }
+      100% { transform: scale(1.1) translateX(-2%); }
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 1024px) {
+      .nav-links { gap: 20px; }
+      .logo-nombre { display: none; }
+    }
+    @media (max-width: 900px) {
+      .carreras-grid { grid-template-columns: repeat(2, 1fr); }
+      .why-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .nav-links,
+      .btn-nav { display: none; }
+      .hamburger { display: block; }
+      .hero { padding-top: 140px; }
+      .admision-layout { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .form-card { padding: 28px; }
+    }
+    @media (max-width: 640px) {
+      .hero-stats { gap: 12px; }
+      .stat-sep { display: none; }
+      .stat-num { font-size: 28px; }
+      .carreras-grid { grid-template-columns: 1fr; }
+      .testimonio-card { padding: 30px 22px; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .nav-inner,
+      .nav-mobile,
+      .hero,
+      .carreras-section,
+      .admision-section,
+      .stats-section,
+      .why-section,
+      .testimonios-section,
+      .mapa-section,
+      .final-form-section,
+      footer {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+      .whatsapp-float {
+        width: 56px;
+        height: 56px;
+        font-size: 26px;
+        right: 16px;
+        bottom: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- SECCION: NAVBAR -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#inicio" class="nav-logo">
+        <span class="logo-sigla">UCF</span>
+        <span class="logo-nombre">Universidad Continental del Futuro</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#carreras">Carreras</a></li>
+        <li><a href="#admision">Admisión</a></li>
+        <li><a href="#campus">Campus</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
+      </ul>
+      <a href="#admision" class="btn-nav">Postular 2025</a>
+      <button class="hamburger" id="hamburger" aria-label="Menú">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+    <div class="nav-mobile" id="nav-mobile">
+      <a href="#inicio">Inicio</a>
+      <a href="#carreras">Carreras</a>
+      <a href="#admision">Admisión</a>
+      <a href="#campus">Campus</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#admision" class="btn-nav-mobile">Postular 2025</a>
+    </div>
+  </nav>
+
+  <!-- SECCION: HERO -->
+  <section id="inicio" class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge reveal">ACREDITADA INTERNACIONALMENTE</div>
+      <p id="hero-ciudad" class="hero-ciudad reveal"></p>
+      <h1 class="hero-title reveal">
+        Forma el profesional que el
+        <span class="text-gold">Perú</span> necesita
+      </h1>
+      <p id="hero-clima" class="hero-clima reveal">Cargando clima de Lima...</p>
+      <div class="hero-btns reveal">
+        <a href="#admision" class="btn-primary">Solicitar Admisión 2025</a>
+        <a href="#carreras" class="btn-outline">Ver Carreras</a>
+      </div>
+    </div>
+    <div class="hero-stats reveal">
+      <div class="hero-stat">
+        <span class="stat-num" data-target="12500">0</span>
+        <span class="stat-label">Egresados</span>
+      </div>
+      <span class="stat-sep">·</span>
+      <div class="hero-stat">
+        <span class="stat-num" data-target="98">0</span><span>%</span>
+        <span class="stat-label">Empleabilidad</span>
+      </div>
+      <span class="stat-sep">·</span>
+      <div class="hero-stat">
+        <span class="stat-num" data-target="25">0</span>
+        <span class="stat-label">Años de experiencia</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCION: CARRERAS -->
+  <section id="carreras" class="carreras-section">
+    <div class="section-header reveal">
+      <span class="section-tag">Oferta Académica</span>
+      <h2 class="section-title">Elige tu carrera ideal</h2>
+      <p class="section-subtitle">Explora programas diseñados para transformar tu vocación en impacto profesional real.</p>
+    </div>
+    <div class="buscador-wrap reveal">
+      <i class="fas fa-magnifying-glass icon-lupa"></i>
+      <input id="buscador-input" type="text" placeholder="Busca por carrera o área..." />
+    </div>
+    <div id="carreras-grid" class="carreras-grid"></div>
+  </section>
+
+  <!-- SECCION: ADMISION DNI -->
+  <section id="admision" class="admision-section">
+    <div class="admision-layout">
+      <div class="admision-info reveal">
+        <span class="section-tag">Admisión 2025</span>
+        <h2>Postula en minutos y asegura tu vacante</h2>
+        <p>Completa tus datos y valida tu DNI automáticamente para acelerar tu proceso de admisión.</p>
+        <p>Recibe orientación personalizada sobre becas, horarios, modalidad y financiamiento educativo.</p>
+      </div>
+      <div class="form-card reveal">
+        <form id="form-admision">
+          <div class="form-group">
+            <label for="dni-adm">DNI</label>
+            <input id="dni-adm" class="input-dni" type="text" inputmode="numeric" maxlength="8" placeholder="Ingresa tu DNI" required />
+            <span class="dni-status"></span>
+          </div>
+          <div class="dni-msg"></div>
+          <div class="form-group">
+            <label for="nombre-adm">Nombre completo</label>
+            <input id="nombre-adm" class="input-nombre" type="text" placeholder="Se completará automáticamente" required />
+          </div>
+          <div class="form-group">
+            <label for="carrera-adm">Carrera de interés</label>
+            <select id="carrera-adm" required>
+              <option value="">Selecciona una carrera</option>
+              <option>Ingeniería de Sistemas</option>
+              <option>Administración de Empresas</option>
+              <option>Derecho</option>
+              <option>Medicina Humana</option>
+              <option>Psicología</option>
+              <option>Marketing Digital</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="modalidad-adm">Modalidad</label>
+            <select id="modalidad-adm" required>
+              <option value="">Selecciona modalidad</option>
+              <option>Presencial</option>
+              <option>Virtual</option>
+              <option>Semipresencial</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="tel-adm">Teléfono</label>
+            <input id="tel-adm" type="tel" placeholder="+51 999 999 999" required />
+          </div>
+          <div class="form-group">
+            <label for="email-adm">Email</label>
+            <input id="email-adm" type="email" placeholder="correo@ejemplo.com" required />
+          </div>
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-paper-plane"></i>
+            Enviar Solicitud
+          </button>
+        </form>
+        <div id="success-admision" class="form-success">
+          <div class="success-icon"><i class="fas fa-check"></i></div>
+          <h3>¡Solicitud enviada!</h3>
+          <p>Tu asesor académico se comunicará contigo en las próximas 24 horas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCION: ESTADISTICAS -->
+  <section class="stats-section">
+    <div class="stats-grid reveal">
+      <div class="stat-item">
+        <i class="fas fa-users"></i>
+        <span class="count" data-target="15000" data-suffix="+">0</span>
+        <span>Estudiantes</span>
+      </div>
+      <div class="stat-item">
+        <i class="fas fa-chart-bar"></i>
+        <span class="count" data-target="98" data-suffix="%">0</span>
+        <span>Empleabilidad</span>
+      </div>
+      <div class="stat-item">
+        <i class="fas fa-chalkboard-teacher"></i>
+        <span class="count" data-target="120" data-suffix="+">0</span>
+        <span>Docentes especializados</span>
+      </div>
+      <div class="stat-item">
+        <i class="fas fa-award"></i>
+        <span class="count" data-target="25" data-suffix="">0</span>
+        <span>Años de excelencia</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCION: POR QUE ELEGIRNOS -->
+  <section id="nosotros" class="why-section">
+    <div class="section-header reveal">
+      <span class="section-tag">Diferenciales UCF</span>
+      <h2 class="section-title">¿Por qué elegirnos?</h2>
+      <p class="section-subtitle">Nuestra propuesta combina calidad académica, visión global y flexibilidad para tu crecimiento.</p>
+    </div>
+    <div class="why-grid">
+      <article class="why-card reveal">
+        <i class="fas fa-certificate"></i>
+        <h3>Acreditación Internacional</h3>
+        <p>Reconocida por organismos internacionales de calidad educativa.</p>
+      </article>
+      <article class="why-card reveal">
+        <i class="fas fa-globe"></i>
+        <h3>Convenios Globales</h3>
+        <p>Alianzas con universidades de Europa, EEUU y Asia Pacífico.</p>
+      </article>
+      <article class="why-card reveal">
+        <i class="fas fa-clock"></i>
+        <h3>Modalidad Flexible</h3>
+        <p>Presencial, virtual o semipresencial según tu ritmo de vida.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECCION: TESTIMONIOS -->
+  <section class="testimonios-section">
+    <div class="section-header reveal">
+      <span class="section-tag">Historias Reales</span>
+      <h2 class="section-title">Testimonios de nuestros alumnos</h2>
+    </div>
+    <div class="carousel-wrapper reveal">
+      <div id="testimonios-track"></div>
+      <div id="carousel-dots"></div>
+    </div>
+  </section>
+
+  <!-- SECCION: MAPA -->
+  <section id="campus" class="mapa-section">
+    <div class="section-header reveal">
+      <span class="section-tag">Nuestras Sedes</span>
+      <h2 class="section-title">Presencia en toda Lima</h2>
+    </div>
+    <div class="mapa-wrap reveal">
+      <div id="mapa-ucf"></div>
+    </div>
+  </section>
+
+  <!-- SECCION: FORMULARIO FINAL -->
+  <section class="final-form-section">
+    <div class="section-header reveal">
+      <span class="section-tag">Último Paso</span>
+      <h2 class="section-title">Recibe información personalizada</h2>
+      <p class="section-subtitle">Completa este formulario para recibir una llamada de admisiones y planificar tu matrícula.</p>
+    </div>
+    <div class="final-form-wrap">
+      <div class="form-card reveal">
+        <form id="form-final">
+          <div class="form-group">
+            <label for="dni-final">DNI</label>
+            <input id="dni-final" class="input-dni" type="text" inputmode="numeric" maxlength="8" placeholder="Ingresa tu DNI" required />
+            <span class="dni-status"></span>
+          </div>
+          <div class="form-group">
+            <label for="nombre-final">Nombre completo</label>
+            <input id="nombre-final" class="input-nombre" type="text" placeholder="Se completará automáticamente" required />
+          </div>
+          <div class="form-group">
+            <label for="carrera-final">Carrera</label>
+            <select id="carrera-final" required>
+              <option value="">Selecciona una carrera</option>
+              <option>Ingeniería de Sistemas</option>
+              <option>Administración de Empresas</option>
+              <option>Derecho</option>
+              <option>Medicina Humana</option>
+              <option>Psicología</option>
+              <option>Marketing Digital</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="modalidad-final">Modalidad</label>
+            <select id="modalidad-final" required>
+              <option value="">Selecciona modalidad</option>
+              <option>Presencial</option>
+              <option>Virtual</option>
+              <option>Semipresencial</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="tel-final">Teléfono</label>
+            <input id="tel-final" type="tel" placeholder="+51 999 999 999" required />
+          </div>
+          <div class="form-group">
+            <label for="email-final">Email</label>
+            <input id="email-final" type="email" placeholder="correo@ejemplo.com" required />
+          </div>
+          <div class="form-group">
+            <label for="msg-final">Mensaje</label>
+            <textarea id="msg-final" placeholder="Cuéntanos qué carrera te interesa y en qué horario prefieres estudiar"></textarea>
+          </div>
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-paper-plane"></i>
+            Solicitar Contacto
+          </button>
+          <p class="form-note">🔒 Tus datos están protegidos. No realizamos spam.</p>
+        </form>
+        <div id="success-final" class="form-success">
+          <div class="success-icon"><i class="fas fa-check"></i></div>
+          <h3>¡Registro completado!</h3>
+          <p>Tu asesor académico se comunicará contigo para brindarte todos los detalles.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCION: FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-col reveal">
+        <h4>Universidad Continental del Futuro</h4>
+        <p>Formamos líderes con visión global, impacto local y alto nivel profesional.</p>
+        <div class="social-links">
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-col reveal">
+        <h4>Links rápidos</h4>
+        <ul>
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#carreras">Carreras</a></li>
+          <li><a href="#admision">Admisión 2025</a></li>
+          <li><a href="#campus">Campus</a></li>
+          <li><a href="#nosotros">Nosotros</a></li>
+        </ul>
+      </div>
+      <div class="footer-col reveal">
+        <h4>Contacto</h4>
+        <ul class="footer-contact">
+          <li><i class="fas fa-phone"></i><span>(01) 234-5678 / +51 987 654 321</span></li>
+          <li><i class="fas fa-envelope"></i><span>contacto@ucf.edu.pe</span></li>
+          <li><i class="fas fa-location-dot"></i><span>Av. Javier Prado Este 1234, San Isidro, Lima</span></li>
+        </ul>
+      </div>
+      <div class="footer-col reveal">
+        <h4>Horarios</h4>
+        <p>Lunes a Viernes: 8:00 am - 8:00 pm</p>
+        <p>Sábados: 9:00 am - 2:00 pm</p>
+        <p>Atención virtual: 24/7</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Universidad Continental del Futuro · RUC: 20123456789</p>
+    </div>
+  </footer>
+
+  <!-- COMPONENTE: WHATSAPP FLOTANTE -->
+  <a href="https://wa.me/51987654321?text=Hola%2C%20me%20interesa%20información%20sobre%20admisiones"
+     class="whatsapp-float" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    // === TOKEN — ÚNICA LÍNEA A EDITAR ===
+    const APIPERU_TOKEN = "07c2538f6ade43835c5343012a503a20781827773637b52152de445f4ac4d326";
+
+    // === SECCIÓN: DATOS BASE ===
+    const CARRERAS = [
+      { nombre: "Ingeniería de Sistemas", icono: "fa-laptop-code", desc: "Tecnología e innovación digital" },
+      { nombre: "Administración de Empresas", icono: "fa-briefcase", desc: "Liderazgo y gestión empresarial" },
+      { nombre: "Derecho", icono: "fa-scale-balanced", desc: "Justicia y ciencias jurídicas" },
+      { nombre: "Medicina Humana", icono: "fa-heart-pulse", desc: "Salud y bienestar integral" },
+      { nombre: "Psicología", icono: "fa-brain", desc: "Mente, conducta y bienestar" },
+      { nombre: "Marketing Digital", icono: "fa-chart-line", desc: "Estrategia y marca en el mundo digital" }
+    ];
+
+    const TESTIMONIOS_TEXTO = [
+      "La UCF cambió mi vida. Hoy trabajo en una empresa multinacional gracias a la formación de clase mundial que recibí.",
+      "Docentes con experiencia real en el mercado. No solo teoría, sino práctica desde el primer ciclo.",
+      "El programa de Medicina es exigente pero los resultados hablan solos. Pasé el SERUMS en el top 5%.",
+      "Modalidad semipresencial perfecta para trabajar y estudiar. Los profesores siempre disponibles.",
+      "El campus y los laboratorios son de primer nivel. La infraestructura hace la diferencia.",
+      "Conseguí trabajo antes de egresar gracias a la bolsa laboral y las prácticas pre-profesionales."
+    ];
+
+    const CARRERAS_TEST = ["Ing. de Sistemas", "Administración", "Medicina Humana", "Psicología", "Marketing Digital", "Derecho"];
+
+    // === SECCIÓN: NAVBAR ===
+    function initNavbar() {
+      const navbar = document.getElementById("navbar");
+      const hamburger = document.getElementById("hamburger");
+      const navMobile = document.getElementById("nav-mobile");
+      if (!navbar || !hamburger || !navMobile) return;
+
+      window.addEventListener("scroll", () => {
+        navbar.classList.toggle("scrolled", window.scrollY > 60);
+      });
+
+      hamburger.addEventListener("click", () => {
+        navMobile.classList.toggle("open");
+      });
+
+      navMobile.querySelectorAll("a").forEach((a) => {
+        a.addEventListener("click", () => navMobile.classList.remove("open"));
+      });
+    }
+
+    // === SECCIÓN: REVEAL AL SCROLL ===
+    function initReveal() {
+      const els = document.querySelectorAll(".reveal");
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("visible");
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      els.forEach((el) => obs.observe(el));
+    }
+
+    // === SECCIÓN: CLIMA (Open-Meteo) ===
+    async function initClima() {
+      try {
+        const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=-12.04&longitude=-77.03&current=temperature_2m,weathercode");
+        const data = await res.json();
+        const temp = Math.round(data.current.temperature_2m);
+        const code = data.current.weathercode ?? data.current.weather_code ?? 2;
+        const icon = code <= 1 ? "☀️" : code <= 3 ? "⛅" : "🌤";
+        document.getElementById("hero-clima").textContent = `${icon} Lima, ${temp}°C — Buen día para iniciar tu futuro`;
+      } catch (_) {
+        document.getElementById("hero-clima").textContent = "📍 Lima, Perú — Tu futuro comienza aquí";
+      }
+    }
+
+    // === SECCIÓN: GEOLOCALIZACIÓN IP (ipinfo.io) ===
+    async function initIP() {
+      try {
+        const res = await fetch("https://ipinfo.io/json");
+        const data = await res.json();
+        if (data.city) {
+          document.getElementById("hero-ciudad").textContent = `Conectado desde ${data.city}`;
+        }
+      } catch (_) {
+        // fallo silencioso
+      }
+    }
+
+    // === SECCIÓN: BUSCADOR DE CARRERAS ===
+    function initBuscador() {
+      const grid = document.getElementById("carreras-grid");
+      const input = document.getElementById("buscador-input");
+      if (!grid || !input) return;
+
+      function renderCarreras(lista) {
+        grid.innerHTML = lista.map((c) => `
+          <div class="carrera-card reveal">
+            <div class="icono"><i class="fas ${c.icono}"></i></div>
+            <h3>${c.nombre}</h3>
+            <p>${c.desc}</p>
+            <span class="ver-mas">Ver pensum →</span>
+          </div>
+        `).join("");
+        initReveal();
+      }
+
+      renderCarreras(CARRERAS);
+
+      input.addEventListener("input", (e) => {
+        const q = e.target.value.toLowerCase();
+        const filtradas = CARRERAS.filter((c) =>
+          c.nombre.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q)
+        );
+        renderCarreras(filtradas);
+      });
+    }
+
+    // === SECCIÓN: DNI (apiperu.dev) ===
+    async function fetchDNI(dni) {
+      try {
+        const res = await fetch(`https://apiperu.dev/api/dni/${dni}`, {
+          headers: { Authorization: "Bearer " + APIPERU_TOKEN }
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        const nombre = data.nombre ||
+          `${data.nombres || ""} ${data.apellido_paterno || ""} ${data.apellido_materno || ""}`.trim();
+        return nombre || null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function bindDNI(inputDNI, inputNombre, statusEl, msgEl) {
+      if (!inputDNI || !inputNombre || !statusEl) return;
+
+      inputDNI.addEventListener("input", async (e) => {
+        const val = e.target.value.replace(/\D/g, "").slice(0, 8);
+        e.target.value = val;
+
+        if (val.length === 8) {
+          statusEl.textContent = "Verificando...";
+          statusEl.className = "dni-status loading";
+          const nombre = await fetchDNI(val);
+          if (nombre) {
+            inputNombre.value = nombre;
+            inputNombre.readOnly = true;
+            statusEl.textContent = "✓ DNI Verificado";
+            statusEl.className = "dni-status success";
+            if (msgEl) {
+              msgEl.textContent = `¡Hola ${nombre.split(" ")[0]}! Tienes cupo disponible en nuestra próxima admisión.`;
+              msgEl.style.display = "block";
+            }
+          } else {
+            inputNombre.readOnly = false;
+            statusEl.textContent = "";
+            statusEl.className = "dni-status";
+            if (msgEl) msgEl.style.display = "none";
+          }
+        } else {
+          inputNombre.readOnly = false;
+          inputNombre.value = "";
+          statusEl.textContent = "";
+          statusEl.className = "dni-status";
+          if (msgEl) msgEl.style.display = "none";
+        }
+      });
+    }
+
+    // === SECCIÓN: CONTADORES ANIMADOS ===
+    function initCountUp() {
+      const counters = document.querySelectorAll(".count, .stat-num");
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          const target = parseInt(el.dataset.target || "0", 10);
+          const suffix = el.dataset.suffix || "";
+          const duration = 2000;
+          const start = performance.now();
+          const animate = (now) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const ease = 1 - Math.pow(1 - progress, 3);
+            const value = Math.floor(ease * target);
+            el.textContent = value.toLocaleString("es-PE") + suffix;
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+          obs.unobserve(el);
+        });
+      }, { threshold: 0.5 });
+      counters.forEach((c) => obs.observe(c));
+    }
+
+    // === SECCIÓN: TESTIMONIOS (RandomUser) ===
+    async function initTestimonios() {
+      try {
+        const res = await fetch("https://randomuser.me/api/?results=6&nat=es&inc=name,picture");
+        const data = await res.json();
+        renderTestimonios(data.results);
+      } catch (_) {
+        renderTestimoniosFallback();
+      }
+    }
+
+    function renderTestimonios(users) {
+      const container = document.getElementById("testimonios-track");
+      if (!container) return;
+      container.innerHTML = users.map((u, i) => `
+        <div class="testimonio-card">
+          <img src="${u.picture.large}" alt="${u.name.first}" />
+          <div class="stars">${"★".repeat(5)}</div>
+          <p>"${TESTIMONIOS_TEXTO[i]}"</p>
+          <strong>${u.name.first} ${u.name.last}</strong>
+          <span>${CARRERAS_TEST[i]}</span>
+        </div>
+      `).join("");
+      initCarousel();
+    }
+
+    function renderTestimoniosFallback() {
+      const nombres = ["Ana R.", "Carlos M.", "Lucía P.", "Diego V.", "María F.", "José T."];
+      const container = document.getElementById("testimonios-track");
+      if (!container) return;
+      container.innerHTML = nombres.map((n, i) => `
+        <div class="testimonio-card">
+          <div class="avatar-inicial">${n[0]}</div>
+          <div class="stars">${"★".repeat(5)}</div>
+          <p>"${TESTIMONIOS_TEXTO[i]}"</p>
+          <strong>${n}</strong>
+          <span>${CARRERAS_TEST[i]}</span>
+        </div>
+      `).join("");
+      initCarousel();
+    }
+
+    function initCarousel() {
+      const track = document.getElementById("testimonios-track");
+      const dots = document.getElementById("carousel-dots");
+      if (!track || !dots) return;
+      const cards = track.querySelectorAll(".testimonio-card");
+      if (!cards.length) return;
+
+      let current = 0;
+      let timer;
+
+      dots.innerHTML = Array.from(cards).map((_, i) =>
+        `<button class="dot ${i === 0 ? "active" : ""}" data-i="${i}" aria-label="Ir al testimonio ${i + 1}"></button>`
+      ).join("");
+
+      function goTo(i) {
+        current = (i + cards.length) % cards.length;
+        track.style.transform = `translateX(-${current * 100}%)`;
+        dots.querySelectorAll(".dot").forEach((d, j) => d.classList.toggle("active", j === current));
+      }
+
+      dots.querySelectorAll(".dot").forEach((d) => {
+        d.addEventListener("click", () => {
+          clearInterval(timer);
+          goTo(+d.dataset.i);
+          startAuto();
+        });
+      });
+
+      function startAuto() {
+        timer = setInterval(() => goTo(current + 1), 4000);
+      }
+
+      startAuto();
+      track.addEventListener("mouseenter", () => clearInterval(timer));
+      track.addEventListener("mouseleave", startAuto);
+    }
+
+    // === SECCIÓN: MAPA (Leaflet) ===
+    function initMapa() {
+      const mapEl = document.getElementById("mapa-ucf");
+      if (!mapEl || typeof L === "undefined") return;
+
+      const sedes = [
+        { lat: -18.119, lng: -77.03, nombre: "Sede Miraflores", dir: "Av. Larco 1234, Miraflores" },
+        { lat: -12.096, lng: -77.036, nombre: "Sede San Isidro", dir: "Av. Javier Prado Este 1234, San Isidro" },
+        { lat: -12.109, lng: -76.994, nombre: "Sede San Borja", dir: "Av. Aviación 3456, San Borja" }
+      ];
+
+      const map = L.map("mapa-ucf").setView([-12.1, -77.02], 12);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap contributors"
+      }).addTo(map);
+
+      const iconoUCF = L.divIcon({
+        html: '<div style="background:var(--gold,#F0A500);color:#0A1628;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)">UCF</div>',
+        className: "",
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
+      });
+
+      sedes.forEach((s) => {
+        L.marker([s.lat, s.lng], { icon: iconoUCF })
+          .addTo(map)
+          .bindPopup(`
+            <strong>${s.nombre}</strong><br>
+            ${s.dir}<br>
+            Lun-Vie 8am–8pm · Sab 9am–2pm<br>
+            <a href="#" style="color:#F0A500">Cómo llegar →</a>
+          `);
+      });
+
+      map.fitBounds(sedes.map((s) => [s.lat, s.lng]), { padding: [40, 40] });
+    }
+
+    // === SECCIÓN: FORMULARIOS ===
+    function initForms() {
+      const formAdmision = document.getElementById("form-admision");
+      if (formAdmision) {
+        bindDNI(
+          formAdmision.querySelector(".input-dni"),
+          formAdmision.querySelector(".input-nombre"),
+          formAdmision.querySelector(".dni-status"),
+          formAdmision.querySelector(".dni-msg")
+        );
+        bindSubmit(formAdmision, document.getElementById("success-admision"));
+      }
+
+      const formFinal = document.getElementById("form-final");
+      if (formFinal) {
+        bindDNI(
+          formFinal.querySelector(".input-dni"),
+          formFinal.querySelector(".input-nombre"),
+          formFinal.querySelector(".dni-status"),
+          null
+        );
+        bindSubmit(formFinal, document.getElementById("success-final"));
+      }
+    }
+
+    function bindSubmit(form, successEl) {
+      if (!form || !successEl) return;
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const btn = form.querySelector(".btn-submit");
+        if (!btn) return;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        setTimeout(() => {
+          form.style.display = "none";
+          successEl.style.display = "flex";
+        }, 2000);
+      });
+    }
+
+    // === SECCIÓN: INIT GENERAL ===
+    document.addEventListener("DOMContentLoaded", () => {
+      initNavbar();
+      initReveal();
+      initClima();
+      initIP();
+      initBuscador();
+      initCountUp();
+      initTestimonios();
+      initMapa();
+      initForms();
+    });
+  </script>
+</body>
+</html>

@@ -785,130 +785,67 @@ button {
 
 /* ====== CONTACTO ====== */
 
-.contacto-layout {
-  display: grid;
-  grid-template-columns: 1fr 420px;
-  gap: 60px;
-  align-items: flex-start;
-}
-
-.contacto-form-wrap {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 20px;
-  padding: 48px;
-  backdrop-filter: blur(10px);
-}
-
-.contacto-form {
+.contacto-cta {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 0 40px;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-group label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-  letter-spacing: 0.05em;
-}
-
-.form-group input,
-.form-group textarea {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 14px 18px;
-  color: var(--text-primary);
-  font-size: 15px;
+.btn-whatsapp-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #1db954 0%, #25d366 100%);
+  color: #fff;
   font-family: 'Space Grotesk', sans-serif;
-  transition: border-color 200ms;
-  resize: none;
-  outline: none;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-  border-color: rgba(14, 165, 233, 0.5);
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: rgba(148, 163, 184, 0.5);
-}
-
-.contacto-btn {
-  width: 100%;
-  height: 52px;
-  font-size: 16px;
-}
-
-.contacto-success {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  min-height: 300px;
-  text-align: center;
-}
-
-.success-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--blue-main), var(--purple-main));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  color: white;
-}
-
-.contacto-success h3 {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 700;
+  padding: 20px 44px;
+  border-radius: 100px;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  box-shadow: 0 0 40px rgba(37, 211, 102, 0.35), 0 0 80px rgba(37, 211, 102, 0.15);
+  transition: transform 200ms ease, box-shadow 200ms ease;
 }
 
-.contacto-success p {
+.btn-whatsapp-cta:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 60px rgba(37, 211, 102, 0.5), 0 0 100px rgba(37, 211, 102, 0.2);
+}
+
+.contacto-cta-hint {
+  font-size: 14px;
   color: var(--text-muted);
+  margin: 0;
 }
 
 .contacto-info-card {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  padding: 32px 40px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 20px;
-  padding: 40px 36px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
   backdrop-filter: blur(10px);
-}
-
-.contacto-info-card h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
+  max-width: 640px;
+  margin: 0 auto;
 }
 
 .contacto-canal {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   text-decoration: none;
   color: inherit;
   transition: opacity 200ms;
 }
 
-.contacto-canal:hover {
-  opacity: 0.8;
-}
+.contacto-canal:hover { opacity: 0.75; }
 
 .canal-icono {
   width: 44px;
@@ -917,7 +854,6 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
   flex-shrink: 0;
 }
 
@@ -935,20 +871,6 @@ button {
 .contacto-canal span {
   font-size: 13px;
   color: var(--text-muted);
-}
-
-.contacto-horario {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.contacto-horario p {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin: 0;
 }
 
 /* ====== FOOTER ====== */
@@ -1054,7 +976,5 @@ button {
   .servicios-grid { grid-template-columns: 1fr; }
   .proyectos-grid { grid-template-columns: 1fr; }
   .nosotros-stats { grid-template-columns: repeat(2, 1fr); }
-  .contacto-layout { grid-template-columns: 1fr; }
-  .contacto-form-wrap { padding: 28px 20px; }
-  .contacto-info-card { padding: 28px 20px; }
+  .btn-whatsapp-cta { font-size: 16px; padding: 18px 32px; }
 }

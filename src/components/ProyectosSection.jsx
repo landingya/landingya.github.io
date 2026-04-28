@@ -2,6 +2,15 @@ import { motion } from 'framer-motion'
 
 const proyectos = [
   {
+    nombre: 'UCF — Universidad Continental',
+    tipo: 'Landing Educación',
+    desc: 'Landing de admisión 2026 con countdown en vivo, verificación DNI vía RENIEC, mapa de sedes Leaflet y formulario de pre-admisión.',
+    color: 'from-slate-800 to-blue-900',
+    grad: 'linear-gradient(135deg, #0B1A2E 0%, #1a3a6b 100%)',
+    tags: ['Educación', 'DNI API', 'Demo en vivo'],
+    href: '/demos/educacion/',
+  },
+  {
     nombre: 'Cevichería El Muelle',
     tipo: 'Landing Page',
     desc: 'Landing premium para restaurante de mariscos en Miraflores. Reservas online, menú animado y galería de platos.',
@@ -80,12 +89,22 @@ export default function ProyectosSection() {
           {proyectos.map((p, i) => (
             <motion.article key={p.nombre} className="proyecto-card" {...fadeUp(i + 1)}>
               {/* Preview visual */}
-              <div className="proyecto-preview" style={{ background: p.grad }}>
-                <div className="proyecto-preview-inner">
-                  <span className="proyecto-tipo-badge">{p.tipo}</span>
-                  <span className="proyecto-nombre-preview">{p.nombre}</span>
+              {p.href ? (
+                <a href={p.href} target="_blank" rel="noopener noreferrer" className="proyecto-preview proyecto-preview--link" style={{ background: p.grad }}>
+                  <div className="proyecto-preview-inner">
+                    <span className="proyecto-tipo-badge">{p.tipo}</span>
+                    <span className="proyecto-nombre-preview">{p.nombre}</span>
+                  </div>
+                  <span className="proyecto-preview-hover">Ver demo →</span>
+                </a>
+              ) : (
+                <div className="proyecto-preview" style={{ background: p.grad }}>
+                  <div className="proyecto-preview-inner">
+                    <span className="proyecto-tipo-badge">{p.tipo}</span>
+                    <span className="proyecto-nombre-preview">{p.nombre}</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="proyecto-info">
                 <div className="proyecto-header-row">
@@ -98,6 +117,11 @@ export default function ProyectosSection() {
                     <span key={t} className="proyecto-tag">{t}</span>
                   ))}
                 </div>
+                {p.href && (
+                  <a href={p.href} target="_blank" rel="noopener noreferrer" className="proyecto-demo-link">
+                    Ver demo en vivo →
+                  </a>
+                )}
               </div>
             </motion.article>
           ))}

@@ -730,6 +730,51 @@ button {
   text-shadow: 0 2px 12px rgba(0,0,0,0.4);
 }
 
+.proyecto-preview--link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.proyecto-preview-hover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.proyecto-preview--link:hover .proyecto-preview-hover {
+  opacity: 1;
+}
+
+.proyecto-demo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6366f1;
+  text-decoration: none;
+  margin-top: 4px;
+  transition: gap 0.2s ease;
+}
+
+.proyecto-demo-link:hover {
+  gap: 10px;
+  color: #818cf8;
+}
+
 .proyecto-info {
   padding: 24px;
   display: flex;

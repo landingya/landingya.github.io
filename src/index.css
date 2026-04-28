@@ -633,6 +633,26 @@ button {
   margin: 0;
 }
 
+.nosotros-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.nosotros-foto-wrap {
+  border-radius: 20px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nosotros-foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .nosotros-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -737,6 +757,15 @@ button {
   text-decoration: none;
   cursor: pointer;
   overflow: hidden;
+}
+
+.proyecto-preview-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
 }
 
 .proyecto-preview-hover {

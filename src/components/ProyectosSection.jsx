@@ -9,6 +9,7 @@ const proyectos = [
     grad: 'linear-gradient(135deg, #0B1A2E 0%, #1a3a6b 100%)',
     tags: ['Educación', 'DNI API', 'Demo en vivo'],
     href: '/demos/educacion/',
+    img: '/ucf-preview.jpg',
   },
   {
     nombre: 'Cevichería El Muelle',
@@ -90,7 +91,8 @@ export default function ProyectosSection() {
             <motion.article key={p.nombre} className="proyecto-card" {...fadeUp(i + 1)}>
               {/* Preview visual */}
               {p.href ? (
-                <a href={p.href} target="_blank" rel="noopener noreferrer" className="proyecto-preview proyecto-preview--link" style={{ background: p.grad }}>
+                <a href={p.href} target="_blank" rel="noopener noreferrer" className="proyecto-preview proyecto-preview--link" style={p.img ? {} : { background: p.grad }}>
+                  {p.img && <img src={p.img} alt={p.nombre} className="proyecto-preview-img" />}
                   <div className="proyecto-preview-inner">
                     <span className="proyecto-tipo-badge">{p.tipo}</span>
                     <span className="proyecto-nombre-preview">{p.nombre}</span>

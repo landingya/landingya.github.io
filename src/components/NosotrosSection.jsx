@@ -57,14 +57,19 @@ export default function NosotrosSection() {
             </motion.div>
           </div>
 
-          {/* Columna derecha — stats */}
-          <div className="nosotros-stats">
-            {stats.map((s, i) => (
-              <motion.div key={s.label} className="stat-card" {...fadeUp(i + 1)}>
-                <span className="stat-numero">{s.numero}</span>
-                <span className="stat-label">{s.label}</span>
-              </motion.div>
-            ))}
+          {/* Columna derecha — foto + stats */}
+          <div className="nosotros-right">
+            <motion.div className="nosotros-foto-wrap" {...fadeUp(1)}>
+              <img src="/equipo.jpg" alt="Equipo LandingYa" className="nosotros-foto" />
+            </motion.div>
+            <div className="nosotros-stats">
+              {stats.map((s, i) => (
+                <motion.div key={s.label} className="stat-card" {...fadeUp(i + 2)}>
+                  <span className="stat-numero">{s.numero}</span>
+                  <span className="stat-label">{s.label}</span>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

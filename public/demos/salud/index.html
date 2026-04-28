@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clínica MedPrime Lima — Tu Salud, Nuestra Misión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; color: #111827; background: #fff; }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; }
+    button, input, select { font-family: inherit; }
+
+    /* ── NAVBAR ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      background: #fff; border-bottom: 1px solid #E5E7EB;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .nav-in {
+      max-width: 1200px; margin: 0 auto; padding: 0 32px;
+      height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .nav-logo-ico {
+      width: 38px; height: 38px; background: #16A34A; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .nav-logo-txt .sub  { font-size: 0.65rem; font-weight: 500; color: #6B7280; display: block; line-height: 1; }
+    .nav-logo-txt .main { font-size: 1rem; font-weight: 800; color: #111827; display: block; line-height: 1.3; }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { font-size: 0.875rem; font-weight: 500; color: #374151; transition: color .15s; }
+    .nav-links a:hover { color: #16A34A; }
+    .nav-btn {
+      background: #16A34A; color: #fff; border: none; border-radius: 8px;
+      padding: 10px 18px; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 7px; white-space: nowrap; transition: background .15s;
+    }
+    .nav-btn:hover { background: #15803D; }
+
+    /* ── HERO — imagen de fondo completo ── */
+    .hero {
+      padding-top: 68px; min-height: 90vh;
+      position: relative; display: flex; align-items: center;
+      background: url('img/hero.jpg') right center / cover no-repeat;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0; z-index: 0;
+    }
+    .hero-wrap {
+      position: relative; z-index: 1;
+      max-width: 1200px; width: 100%; margin: 0 auto;
+    }
+    .hero-content { max-width: 540px; }
+
+    .loc-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.85); border: 1px solid #E5E7EB; border-radius: 999px;
+      padding: 5px 14px; font-size: 0.8rem; font-weight: 500; color: #4B5563; margin-bottom: 20px;
+    }
+    .hero-h1 { font-size: 3.6rem; font-weight: 800; line-height: 1.08; letter-spacing: -0.02em; margin-bottom: 16px; }
+    .hero-h1 em { font-style: normal; color: #16A34A; }
+    .hero-sub { font-size: 1rem; color: #4B5563; line-height: 1.65; margin-bottom: 20px; }
+    .weather-box {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,.9); border: 1px solid #E5E7EB; border-radius: 10px;
+      padding: 10px 16px; font-size: 0.875rem; color: #374151; margin-bottom: 28px;
+    }
+    .weather-box .wt { font-weight: 700; }
+    .weather-box .wd { color: #6B7280; }
+    .hero-btns { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+    .btn-dark {
+      background: #111827; color: #fff; border: none; border-radius: 10px;
+      padding: 13px 24px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px; transition: background .15s;
+    }
+    .btn-dark:hover { background: #1F2937; }
+    .btn-ghost {
+      background: rgba(255,255,255,.85); color: #374151; border: 1.5px solid #D1D5DB;
+      border-radius: 10px; padding: 13px 24px; font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: border-color .15s, color .15s;
+    }
+    .btn-ghost:hover { border-color: #16A34A; color: #16A34A; }
+    .hero-trust { display: flex; align-items: center; gap: 20px; }
+    .trust-sep { width: 1px; height: 36px; background: #D1D5DB; }
+    .trust-item { display: flex; align-items: center; gap: 10px; }
+    .trust-ico {
+      width: 34px; height: 34px; background: #DCFCE7; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .trust-txt strong { display: block; font-size: 0.82rem; font-weight: 700; color: #111827; }
+    .trust-txt span   { display: block; font-size: 0.73rem; color: #6B7280; }
+
+    /* ── SECCIONES COMUNES ── */
+    .sec { padding: 88px 32px; }
+    .sec-in { max-width: 1200px; margin: 0 auto; }
+    .sec-label {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      color: #16A34A; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+    }
+    .sec-label::before { content: ''; width: 6px; height: 6px; background: #16A34A; border-radius: 50%; flex-shrink: 0; }
+    .sec-title { font-size: 2.1rem; font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; }
+    .sec-title em { font-style: normal; color: #16A34A; }
+
+    /* ── ESPECIALIDADES ── */
+    .especialidades { background: #fff; }
+    .esp-hdr { text-align: center; margin-bottom: 48px; }
+    .esp-hdr .sec-label { justify-content: center; }
+    .esp-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 16px; }
+    .esp-card {
+      border: 1.5px solid #E5E7EB; border-radius: 14px; padding: 28px 14px 22px;
+      text-align: center; background: #fff; transition: border-color .2s, box-shadow .2s; cursor: default;
+    }
+    .esp-card:hover { border-color: #16A34A; box-shadow: 0 6px 20px rgba(22,163,74,.1); }
+    .esp-ico {
+      width: 60px; height: 60px; border-radius: 50%; border: 2px solid #16A34A;
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; color: #16A34A;
+    }
+    .esp-name { font-size: 0.88rem; font-weight: 700; color: #111827; margin-bottom: 6px; }
+    .esp-desc { font-size: 0.74rem; color: #6B7280; line-height: 1.45; }
+
+    /* ── MÉDICOS ── */
+    .medicos { background: #F9FAFB; }
+    .med-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 40px; }
+    .btn-outline {
+      background: transparent; border: 1.5px solid #D1D5DB; color: #374151;
+      border-radius: 10px; padding: 10px 18px; font-size: 0.875rem; font-weight: 600;
+      cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-outline:hover { border-color: #16A34A; color: #16A34A; }
+    .med-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
+    .med-card {
+      background: #fff; border: 1px solid #E5E7EB; border-radius: 14px;
+      padding: 28px 20px; text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05); transition: box-shadow .2s;
+    }
+    .med-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.09); }
+    .med-foto { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; border: 3px solid #DCFCE7; margin: 0 auto 14px; }
+    .med-name   { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+    .med-esp    { font-size: 0.8rem; font-weight: 600; color: #16A34A; margin-bottom: 10px; }
+    .med-stars  { color: #FBBF24; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 3px; }
+    .med-rating { font-size: 0.78rem; color: #9CA3AF; margin-bottom: 16px; }
+    .btn-perfil {
+      width: 100%; background: transparent; border: 1.5px solid #16A34A; color: #16A34A;
+      border-radius: 8px; padding: 8px; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; transition: background .15s, color .15s;
+    }
+    .btn-perfil:hover { background: #16A34A; color: #fff; }
+
+    /* ── AGENDA ── */
+    .agenda { background: #fff; }
+    .agenda-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    .agenda-lbl   { font-size: 0.7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #16A34A; margin-bottom: 8px; }
+    .agenda-title { font-size: 2rem; font-weight: 800; line-height: 1.2; margin-bottom: 28px; letter-spacing: -0.01em; }
+    .agenda-title em { font-style: normal; color: #16A34A; }
+    .fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .fg { display: flex; flex-direction: column; gap: 5px; }
+    .fg.full { grid-column: 1/-1; }
+    .fg label { font-size: 0.82rem; font-weight: 600; color: #374151; }
+    .fg input, .fg select {
+      padding: 11px 14px; border: 1.5px solid #E5E7EB; border-radius: 8px;
+      font-size: 0.9rem; color: #111827; background: #fff; outline: none;
+      transition: border-color .15s; appearance: none; -webkit-appearance: none;
+    }
+    .fg input:focus, .fg select:focus { border-color: #16A34A; box-shadow: 0 0 0 3px rgba(22,163,74,.08); }
+    .fg select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; cursor: pointer; }
+    .dni-wrap { position: relative; }
+    .dni-wrap input { width: 100%; padding-right: 38px; }
+    .dni-st { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); font-size: 0.8rem; font-weight: 700; }
+    .dni-st.ok { color: #16A34A; }
+    .dni-st.err { color: #DC2626; }
+    .dni-ok { font-size: 0.74rem; color: #16A34A; font-weight: 600; margin-top: 3px; display: none; }
+    .dni-ok.show { display: block; }
+    .fg input[readonly] { background: #F9FAFB; color: #374151; cursor: default; }
+    .btn-confirmar {
+      width: 100%; padding: 14px; background: #16A34A; color: #fff; border: none;
+      border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .15s; margin-top: 4px;
+    }
+    .btn-confirmar:hover { background: #15803D; }
+
+    /* Foto agenda — panel features compacto a la derecha */
+    .agenda-foto { position: relative; border-radius: 18px; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,.12); }
+    .agenda-foto img { width: 100%; height: 460px; object-fit: cover; display: block; }
+    .agenda-feats {
+      position: absolute; bottom: 20px; right: 20px;
+      width: 230px;
+      background: rgba(255,255,255,.97); backdrop-filter: blur(10px);
+      border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.12);
+    }
+    .af { display: flex; align-items: center; gap: 10px; }
+    .af-ico {
+      width: 32px; height: 32px; background: #F0FDF4; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .af strong { display: block; font-size: 0.78rem; font-weight: 700; color: #111827; }
+    .af span   { display: block; font-size: 0.7rem; color: #6B7280; }
+
+    /* ── STATS ── */
+    .stats { background: #fff; border-top: 1px solid #E5E7EB; border-bottom: 1px solid #E5E7EB; padding: 52px 32px; }
+    .stats-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; }
+    .stat { text-align: center; }
+    .stat-ico { width: 44px; height: 44px; background: #F0FDF4; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: #16A34A; }
+    .stat-num { font-size: 2.4rem; font-weight: 800; color: #111827; line-height: 1; margin-bottom: 6px; }
+    .stat-lbl { font-size: 0.82rem; color: #6B7280; font-weight: 500; }
+
+    /* ── SEDES ── */
+    .sedes { background: #F9FAFB; }
+    .sedes-layout { display: grid; grid-template-columns: 1fr 1.45fr; gap: 48px; align-items: start; }
+    .sedes-list { display: flex; flex-direction: column; gap: 14px; margin-top: 26px; }
+    .sede-card {
+      background: #fff; border: 1.5px solid #E5E7EB; border-radius: 14px;
+      padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start;
+      cursor: pointer; transition: border-color .15s, box-shadow .15s;
+    }
+    .sede-card:hover, .sede-card.active { border-color: #16A34A; box-shadow: 0 2px 8px rgba(22,163,74,.1); }
+    .sede-pin {
+      width: 32px; height: 32px; background: #DCFCE7; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; color: #16A34A;
+    }
+    .sede-name { font-size: 0.9rem; font-weight: 700; color: #111827; margin-bottom: 3px; }
+    .sede-addr { font-size: 0.8rem; color: #6B7280; margin-bottom: 3px; }
+    .sede-hrs  { font-size: 0.74rem; color: #9CA3AF; }
+    #map { height: 400px; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,.08); overflow: hidden; }
+
+    /* ── TESTIMONIOS ── */
+    .testimonios { background: #fff; }
+    .testi-hdr { text-align: center; margin-bottom: 48px; }
+    .testi-hdr .sec-label { justify-content: center; }
+    .testi-outer { overflow: hidden; }
+    .testi-track { display: flex; transition: transform .4s cubic-bezier(.4,0,.2,1); }
+    .testi-slide { min-width: 100%; display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; padding: 4px; }
+    .testi-card {
+      background: #fff; border: 1.5px solid #E5E7EB; border-radius: 14px;
+      padding: 22px; text-align: left; box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+    .testi-stars { color: #FBBF24; font-size: 0.9rem; margin-bottom: 10px; letter-spacing: 1px; }
+    .testi-txt   { font-size: 0.83rem; color: #4B5563; line-height: 1.55; margin-bottom: 16px; }
+    .testi-author { display: flex; align-items: center; gap: 10px; }
+    .testi-author img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+    .testi-aname { font-size: 0.85rem; font-weight: 700; color: #111827; }
+    .testi-arole { font-size: 0.74rem; color: #9CA3AF; }
+    .testi-ctrl  { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 36px; }
+    .testi-arrow {
+      width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #D1D5DB;
+      background: #fff; cursor: pointer; font-size: 20px; color: #6B7280;
+      display: flex; align-items: center; justify-content: center; transition: border-color .15s, color .15s;
+    }
+    .testi-arrow:hover { border-color: #16A34A; color: #16A34A; }
+    .testi-dots { display: flex; gap: 8px; align-items: center; }
+    .testi-dot {
+      height: 8px; border-radius: 4px; border: none; cursor: pointer;
+      background: #D1D5DB; transition: width .3s, background .3s; width: 8px; padding: 0;
+    }
+    .testi-dot.active { width: 24px; background: #16A34A; }
+
+    /* ── EMERGENCIAS ── */
+    .emergencias { background: linear-gradient(115deg, #991B1B 0%, #DC2626 100%); padding: 38px 32px; }
+    .emer-in {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+    }
+    .emer-left  { display: flex; align-items: center; gap: 20px; }
+    .emer-copy h3 { font-size: 1.45rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .emer-copy p  { font-size: 0.875rem; color: rgba(255,255,255,.8); }
+    .emer-phone   { display: flex; align-items: center; gap: 12px; }
+    .emer-phone span { font-size: 2rem; font-weight: 800; color: #fff; white-space: nowrap; }
+    .emer-btns  { display: flex; align-items: center; gap: 12px; }
+    .btn-llamar {
+      background: #fff; color: #DC2626; border: none; border-radius: 10px;
+      padding: 12px 20px; font-size: 0.9rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-wa {
+      background: #25D366; color: #fff; border: none; border-radius: 10px;
+      padding: 12px 20px; font-size: 0.9rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ── FOOTER ── */
+    .footer { background: #111827; padding: 64px 32px 28px; }
+    .footer-grid {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr 1.1fr; gap: 40px;
+      padding-bottom: 48px; border-bottom: 1px solid #1F2937;
+    }
+    .f-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .f-logo-ico { width: 38px; height: 38px; background: #16A34A; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .f-logo-txt .sub  { font-size: 0.65rem; color: #6B7280; display: block; }
+    .f-logo-txt .main { font-size: 0.95rem; font-weight: 800; color: #fff; display: block; }
+    .f-desc { font-size: 0.8rem; color: #6B7280; line-height: 1.65; margin-bottom: 18px; }
+    .f-social { display: flex; gap: 8px; }
+    .f-social a { width: 34px; height: 34px; background: #1F2937; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: background .15s; color: #9CA3AF; }
+    .f-social a:hover { background: #16A34A; color: #fff; }
+    .f-col h4 { font-size: 0.875rem; font-weight: 700; color: #fff; margin-bottom: 16px; }
+    .f-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .f-col ul li a { font-size: 0.8rem; color: #6B7280; transition: color .15s; }
+    .f-col ul li a:hover { color: #16A34A; }
+    .f-contact { display: flex; flex-direction: column; gap: 10px; }
+    .f-contact-row { display: flex; align-items: flex-start; gap: 8px; font-size: 0.8rem; color: #6B7280; }
+    .f-contact-row svg { flex-shrink: 0; color: #16A34A; margin-top: 1px; }
+    .f-hours { display: flex; flex-direction: column; gap: 12px; }
+    .f-hour strong { display: block; font-size: 0.8rem; font-weight: 600; color: #D1D5DB; margin-bottom: 2px; }
+    .f-hour span   { font-size: 0.77rem; color: #6B7280; }
+    .footer-bottom {
+      max-width: 1200px; margin: 24px auto 0;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    }
+    .footer-bottom p { font-size: 0.78rem; color: #4B5563; }
+    .footer-bottom-links { display: flex; gap: 20px; }
+    .footer-bottom-links a { font-size: 0.78rem; color: #4B5563; transition: color .15s; }
+    .footer-bottom-links a:hover { color: #16A34A; }
+
+    /* ── FAB WhatsApp ── */
+    .fab {
+      position: fixed; bottom: 28px; right: 28px; z-index: 99;
+      width: 56px; height: 56px; border-radius: 50%; background: #25D366;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(37,211,102,.4); transition: transform .2s;
+    }
+    .fab:hover { transform: scale(1.1); }
+
+    @media (max-width: 767px) {
+      html, body { overflow-x: hidden; }
+
+      .nav-in {
+        height: 62px;
+        padding: 0 14px;
+        gap: 10px;
+      }
+      .nav-links { display: none; }
+      .nav-logo { gap: 8px; min-width: 0; }
+      .nav-logo-ico { width: 34px; height: 34px; border-radius: 8px; }
+      .nav-logo-txt { min-width: 0; }
+      .nav-logo-txt .sub { font-size: 0.6rem; }
+      .nav-logo-txt .main {
+        font-size: 0.86rem;
+        max-width: 128px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .nav-btn {
+        flex-shrink: 0;
+        padding: 9px 11px;
+        font-size: 0.78rem;
+        gap: 5px;
+      }
+      .nav-btn svg { width: 14px; height: 14px; }
+
+      .hero {
+        padding-top: 62px;
+        min-height: auto;
+        align-items: stretch;
+        background-position: center top;
+      }
+      .hero::before {
+        background: linear-gradient(180deg, rgba(255,255,255,.97) 0%, rgba(255,255,255,.9) 58%, rgba(255,255,255,.78) 100%);
+      }
+      .hero-wrap {
+        padding: 58px 18px 46px;
+        display: flex;
+        align-items: center;
+      }
+      .hero-content { max-width: none; width: 100%; }
+      .loc-pill {
+        margin-bottom: 16px;
+        padding: 6px 12px;
+        font-size: 0.76rem;
+      }
+      .hero-h1 {
+        font-size: 2.45rem;
+        line-height: 1.08;
+        letter-spacing: 0;
+        margin-bottom: 14px;
+      }
+      .hero-sub {
+        font-size: 0.95rem;
+        line-height: 1.58;
+        margin-bottom: 16px;
+      }
+      .weather-box {
+        width: 100%;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 7px;
+        padding: 10px 12px;
+        margin-bottom: 22px;
+      }
+      .weather-box .wd {
+        flex-basis: 100%;
+        line-height: 1.35;
+      }
+      .hero-btns {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-bottom: 24px;
+      }
+      .btn-dark,
+      .btn-ghost,
+      .btn-outline,
+      .btn-llamar,
+      .btn-wa {
+        width: 100%;
+        justify-content: center;
+      }
+      .hero-trust {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .trust-sep { display: none; }
+      .trust-item {
+        background: rgba(255,255,255,.82);
+        border: 1px solid #E5E7EB;
+        border-radius: 12px;
+        padding: 12px;
+      }
+
+      .sec {
+        padding: 62px 18px;
+      }
+      .sec-title {
+        font-size: 1.82rem;
+        line-height: 1.18;
+      }
+      .esp-hdr,
+      .testi-hdr {
+        margin-bottom: 30px;
+      }
+      .esp-grid,
+      .med-grid,
+      .fgrid,
+      .stats-grid,
+      .sedes-layout,
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .esp-grid { gap: 12px; }
+      .esp-card {
+        display: grid;
+        grid-template-columns: 54px 1fr;
+        grid-template-areas:
+          "icon name"
+          "icon desc";
+        gap: 4px 12px;
+        padding: 18px;
+        text-align: left;
+        align-items: center;
+      }
+      .esp-ico {
+        grid-area: icon;
+        width: 52px;
+        height: 52px;
+        margin: 0;
+      }
+      .esp-name { grid-area: name; margin-bottom: 0; }
+      .esp-desc { grid-area: desc; }
+
+      .med-head {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 18px;
+        margin-bottom: 28px;
+      }
+      .med-head .sec-title br,
+      .agenda-title br { display: none; }
+      .med-card { padding: 24px 18px; }
+
+      .agenda-layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .agenda-title {
+        font-size: 1.82rem;
+        line-height: 1.18;
+        margin-bottom: 22px;
+      }
+      .fg input,
+      .fg select {
+        min-height: 46px;
+        width: 100%;
+      }
+      .agenda-foto { border-radius: 14px; }
+      .agenda-foto img { height: 360px; }
+      .agenda-feats {
+        left: 14px;
+        right: 14px;
+        bottom: 14px;
+        width: auto;
+        padding: 14px;
+        gap: 10px;
+      }
+
+      .stats {
+        padding: 42px 18px;
+      }
+      .stats-grid { gap: 28px; }
+      .stat-num { font-size: 2rem; }
+
+      .sedes-layout { gap: 28px; }
+      .sede-card {
+        padding: 16px;
+      }
+      .sede-hrs { line-height: 1.45; }
+      #map {
+        height: 320px;
+        border-radius: 12px;
+      }
+
+      .testi-slide {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 2px;
+      }
+      .testi-card { padding: 18px; }
+      .testi-ctrl { margin-top: 26px; }
+
+      .emergencias {
+        padding: 32px 18px;
+      }
+      .emer-in,
+      .emer-left,
+      .emer-phone,
+      .emer-btns {
+        align-items: stretch;
+        flex-direction: column;
+        width: 100%;
+      }
+      .emer-left { gap: 14px; }
+      .emer-phone { gap: 8px; }
+      .emer-phone span {
+        font-size: 1.55rem;
+        white-space: normal;
+      }
+      .emer-btns { gap: 10px; }
+
+      .footer {
+        padding: 52px 18px 24px;
+      }
+      .footer-grid {
+        gap: 30px;
+        padding-bottom: 36px;
+      }
+      .footer-bottom {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .footer-bottom-links {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .fab {
+        right: 18px;
+        bottom: 18px;
+        width: 52px;
+        height: 52px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .nav-logo-txt .main { max-width: 104px; }
+      .nav-btn {
+        padding: 8px 9px;
+        font-size: 0.72rem;
+      }
+      .hero-h1 { font-size: 2.15rem; }
+      .sec-title,
+      .agenda-title { font-size: 1.62rem; }
+      .agenda-foto img { height: 390px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav">
+  <div class="nav-in">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-ico">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <div class="nav-logo-txt">
+        <span class="sub">Clínica</span>
+        <span class="main">MedPrime Lima</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="#especialidades">Especialidades</a>
+      <a href="#medicos">Médicos</a>
+      <a href="#sedes">Sedes</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#blog">Blog</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+    <button class="nav-btn" onclick="document.getElementById('agenda').scrollIntoView({behavior:'smooth'})">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Reservar Cita
+    </button>
+  </div>
+</nav>
+
+<!-- HERO — fondo completo con imagen -->
+<section class="hero">
+  <div class="hero-wrap">
+    <div class="hero-content">
+      <div class="loc-pill">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="#16A34A" stroke="none"/></svg>
+        Hola desde Lima, Perú
+      </div>
+      <h1 class="hero-h1">Tu salud,<br><em>nuestra misión</em></h1>
+      <p class="hero-sub">Tecnología médica de vanguardia y un equipo humano comprometido con tu bienestar y el de tu familia.</p>
+      <div class="weather-box" id="weather-widget">
+        <span id="w-icon">⛅</span>
+        <span class="wt" id="w-temp">Hoy en Lima</span>
+        <span class="wd" id="w-desc"> — cargando…</span>
+      </div>
+      <div class="hero-btns">
+        <button class="btn-dark" onclick="document.getElementById('agenda').scrollIntoView({behavior:'smooth'})">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Reservar Cita
+        </button>
+        <button class="btn-ghost" onclick="document.getElementById('especialidades').scrollIntoView({behavior:'smooth'})">Ver Especialidades →</button>
+      </div>
+      <div class="hero-trust">
+        <div class="trust-item">
+          <div class="trust-ico">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="trust-txt"><strong>ISO 9001</strong><span>Certificación de Calidad</span></div>
+        </div>
+        <div class="trust-sep"></div>
+        <div class="trust-item">
+          <div class="trust-ico">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="trust-txt"><strong>SUSALUD</strong><span>Acreditada</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ESPECIALIDADES -->
+<section class="sec especialidades" id="especialidades">
+  <div class="sec-in">
+    <div class="esp-hdr">
+      <div class="sec-label">ESPECIALIDADES</div>
+      <h2 class="sec-title">Cuidado <em>integral</em> para cada etapa de tu vida</h2>
+    </div>
+    <div class="esp-grid">
+      <div class="esp-card">
+        <div class="esp-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <div class="esp-name">Cardiología</div>
+        <div class="esp-desc">Diagnóstico y tratamiento de enfermedades del corazón.</div>
+      </div>
+      <div class="esp-card">
+        <div class="esp-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg></div>
+        <div class="esp-name">Neurología</div>
+        <div class="esp-desc">Atención especializada para el cerebro y sistema nervioso.</div>
+      </div>
+      <div class="esp-card">
+        <div class="esp-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><path d="M6.5 10.5C6.5 8.5 9 7 12 7s5.5 1.5 5.5 3.5v1L16 19H8l-1.5-7.5v-1z"/><path d="M9.5 14h5M10 17.5h4"/></svg></div>
+        <div class="esp-name">Pediatría</div>
+        <div class="esp-desc">Cuidado integral para la salud de niños y adolescentes.</div>
+      </div>
+      <div class="esp-card">
+        <div class="esp-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18.5 3.5a2.121 2.121 0 0 0-3 3L7 15a2.121 2.121 0 0 0-3 3 2.121 2.121 0 0 0 3-3l8.5-8.5a2.121 2.121 0 0 0 3-3z"/><path d="M5.5 5.5a2.121 2.121 0 0 1 3 3L17 17a2.121 2.121 0 0 1 3 3 2.121 2.121 0 0 1-3-3L8.5 8.5a2.121 2.121 0 0 1-3-3z"/></svg></div>
+        <div class="esp-name">Traumatología</div>
+        <div class="esp-desc">Tratamiento de lesiones óseas, articulares y musculares.</div>
+      </div>
+      <div class="esp-card">
+        <div class="esp-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M12 12v4M9 18h6M10 15.5l-1.5 2.5M14 15.5l1.5 2.5"/></svg></div>
+        <div class="esp-name">Ginecología</div>
+        <div class="esp-desc">Salud femenina en cada etapa de la vida.</div>
+      </div>
+      <div class="esp-card">
+        <div class="esp-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-2.5 0-5 2-5 5 0 2 1 3.5 2.5 4.5C8 13 7 15 7 17c0 2.5 2 4 5 4s5-1.5 5-4c0-2-1-4-2.5-5.5C16 10.5 17 9 17 7c0-3-2.5-5-5-5z"/><path d="M12 11.5v2"/></svg></div>
+        <div class="esp-name">Oncología</div>
+        <div class="esp-desc">Diagnóstico y tratamiento integral del cáncer.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MÉDICOS -->
+<section class="sec medicos" id="medicos">
+  <div class="sec-in">
+    <div class="med-head">
+      <div>
+        <div class="sec-label">NUESTROS MÉDICOS</div>
+        <h2 class="sec-title">Especialistas comprometidos<br>con <em>tu bienestar</em></h2>
+      </div>
+      <button class="btn-outline">Ver todos los médicos →</button>
+    </div>
+    <div class="med-grid">
+      <div class="med-card">
+        <img class="med-foto" src="https://i.pravatar.cc/200?img=11" alt="Dr. Carlos Mendoza">
+        <div class="med-name">Dr. Carlos Mendoza</div>
+        <div class="med-esp">Cardiología</div>
+        <div class="med-stars">★★★★★</div>
+        <div class="med-rating">4.9</div>
+        <button class="btn-perfil">Ver perfil</button>
+      </div>
+      <div class="med-card">
+        <img class="med-foto" src="https://i.pravatar.cc/200?img=47" alt="Dra. Andrea Velásquez">
+        <div class="med-name">Dra. Andrea Velásquez</div>
+        <div class="med-esp">Neurología</div>
+        <div class="med-stars">★★★★★</div>
+        <div class="med-rating">4.8</div>
+        <button class="btn-perfil">Ver perfil</button>
+      </div>
+      <div class="med-card">
+        <img class="med-foto" src="https://i.pravatar.cc/200?img=15" alt="Dr. José Ramírez">
+        <div class="med-name">Dr. José Ramírez</div>
+        <div class="med-esp">Traumatología</div>
+        <div class="med-stars">★★★★★</div>
+        <div class="med-rating">4.9</div>
+        <button class="btn-perfil">Ver perfil</button>
+      </div>
+      <div class="med-card">
+        <img class="med-foto" src="https://i.pravatar.cc/200?img=44" alt="Dra. María López">
+        <div class="med-name">Dra. María López</div>
+        <div class="med-esp">Ginecología</div>
+        <div class="med-stars">★★★★★</div>
+        <div class="med-rating">4.8</div>
+        <button class="btn-perfil">Ver perfil</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AGENDA — DNI primero, nombre se llena solo -->
+<section class="sec agenda" id="agenda">
+  <div class="sec-in">
+    <div class="agenda-layout">
+      <div>
+        <div class="agenda-lbl">RESERVA TU CITA</div>
+        <h2 class="agenda-title">Agenda tu cita de forma<br><em>rápida y fácil</em></h2>
+        <form onsubmit="handleSubmit(event)">
+          <div class="fgrid">
+            <!-- DNI primero -->
+            <div class="fg">
+              <label for="dni">DNI</label>
+              <div class="dni-wrap">
+                <input type="text" id="dni" placeholder="12345678" maxlength="8" inputmode="numeric" oninput="onDNI(this.value)" required>
+                <span class="dni-st" id="dni-st"></span>
+              </div>
+              <span class="dni-ok" id="dni-ok">✓ DNI válido</span>
+            </div>
+            <div class="fg">
+              <label for="especialidad">Especialidad</label>
+              <select id="especialidad" required>
+                <option value="">Seleccionar</option>
+                <option>Cardiología</option>
+                <option>Neurología</option>
+                <option>Pediatría</option>
+                <option>Traumatología</option>
+                <option>Ginecología</option>
+                <option>Oncología</option>
+                <option>Medicina General</option>
+              </select>
+            </div>
+            <!-- Nombre se llena automáticamente desde el DNI -->
+            <div class="fg full">
+              <label for="nombre">Nombre completo</label>
+              <input type="text" id="nombre" placeholder="Se completa automáticamente con tu DNI" readonly>
+            </div>
+            <div class="fg">
+              <label for="fecha">Fecha</label>
+              <input type="date" id="fecha" required>
+            </div>
+            <div class="fg">
+              <label for="hora">Hora</label>
+              <select id="hora" required>
+                <option value="">Seleccionar</option>
+                <option>8:00 AM</option>
+                <option>9:00 AM</option>
+                <option>10:00 AM</option>
+                <option>11:00 AM</option>
+                <option>2:00 PM</option>
+                <option>3:00 PM</option>
+                <option>4:00 PM</option>
+                <option>5:00 PM</option>
+              </select>
+            </div>
+            <div class="fg full">
+              <label for="sede">Sede</label>
+              <select id="sede" required>
+                <option>Sede Miraflores</option>
+                <option>Sede San Isidro</option>
+                <option>Sede La Molina</option>
+              </select>
+            </div>
+            <div class="fg full">
+              <button type="submit" class="btn-confirmar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                Confirmar Cita
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="agenda-foto">
+        <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80&fit=crop" alt="Instalaciones Clínica MedPrime Lima">
+        <div class="agenda-feats">
+          <div class="af">
+            <div class="af-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg></div>
+            <div><strong>Atención de calidad</strong><span>Médicos de última generación</span></div>
+          </div>
+          <div class="af">
+            <div class="af-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/></svg></div>
+            <div><strong>Profesionales expertos</strong><span>Médicos altamente calificados</span></div>
+          </div>
+          <div class="af">
+            <div class="af-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div><strong>Seguridad garantizada</strong><span>Protocolos de bioseguridad</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-grid">
+    <div class="stat">
+      <div class="stat-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <div class="stat-num">50,000+</div>
+      <div class="stat-lbl">Pacientes atendidos</div>
+    </div>
+    <div class="stat">
+      <div class="stat-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a8.38 8.38 0 0 1 13 0"/></svg></div>
+      <div class="stat-num">200+</div>
+      <div class="stat-lbl">Médicos especialistas</div>
+    </div>
+    <div class="stat">
+      <div class="stat-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg></div>
+      <div class="stat-num">15</div>
+      <div class="stat-lbl">Especialidades</div>
+    </div>
+    <div class="stat">
+      <div class="stat-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></div>
+      <div class="stat-num">3</div>
+      <div class="stat-lbl">Sedes en Lima</div>
+    </div>
+  </div>
+</div>
+
+<!-- SEDES -->
+<section class="sec sedes" id="sedes">
+  <div class="sec-in">
+    <div class="sedes-layout">
+      <div>
+        <div class="sec-label">NUESTRAS SEDES</div>
+        <h2 class="sec-title">Estamos <em>cerca de ti</em></h2>
+        <div class="sedes-list">
+          <div class="sede-card active" onclick="focusSede(0)">
+            <div class="sede-pin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <div><div class="sede-name">Sede Miraflores</div><div class="sede-addr">Av. Larco 1234, Miraflores</div><div class="sede-hrs">Lun - Vie: 7:00 am - 9:00 pm &nbsp;|&nbsp; Sáb: 8:00 am - 2:00 pm</div></div>
+          </div>
+          <div class="sede-card" onclick="focusSede(1)">
+            <div class="sede-pin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <div><div class="sede-name">Sede San Isidro</div><div class="sede-addr">Av. Javier Prado Este 2345</div><div class="sede-hrs">Lun - Vie: 7:00 am - 9:00 pm &nbsp;|&nbsp; Sáb: 8:00 am - 2:00 pm</div></div>
+          </div>
+          <div class="sede-card" onclick="focusSede(2)">
+            <div class="sede-pin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <div><div class="sede-name">Sede La Molina</div><div class="sede-addr">Av. La Molina 5678</div><div class="sede-hrs">Lun - Vie: 7:00 am - 9:00 pm &nbsp;|&nbsp; Sáb: 8:00 am - 2:00 pm</div></div>
+          </div>
+        </div>
+      </div>
+      <div id="map"></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIOS -->
+<section class="sec testimonios" id="blog">
+  <div class="sec-in">
+    <div class="testi-hdr">
+      <div class="sec-label">TESTIMONIOS</div>
+      <h2 class="sec-title">Nuestros pacientes nos <em>recomiendan</em></h2>
+    </div>
+    <div class="testi-outer">
+      <div class="testi-track" id="testi-track">
+        <div class="testi-slide">
+          <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-txt">"Excelente atención y profesionales de primera. Me siento en las mejores manos en todo momento."</p><div class="testi-author"><img src="https://i.pravatar.cc/100?img=5" alt="María G."><div><div class="testi-aname">María G.</div><div class="testi-arole">Paciente</div></div></div></div>
+          <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-txt">"La tecnología y las instalaciones son de primer nivel. 100% recomendable para toda la familia."</p><div class="testi-author"><img src="https://i.pravatar.cc/100?img=12" alt="Luis R."><div><div class="testi-aname">Luis R.</div><div class="testi-arole">Paciente</div></div></div></div>
+          <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-txt">"Gracias a todo el equipo de MedPrime por su dedicación y cuidado en mi tratamiento."</p><div class="testi-author"><img src="https://i.pravatar.cc/100?img=25" alt="Carmen A."><div><div class="testi-aname">Carmen A.</div><div class="testi-arole">Paciente</div></div></div></div>
+          <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-txt">"Atención rápida, amable y muy profesional. La mejor clínica de Lima sin duda."</p><div class="testi-author"><img src="https://i.pravatar.cc/100?img=33" alt="Jorge M."><div><div class="testi-aname">Jorge M.</div><div class="testi-arole">Paciente</div></div></div></div>
+        </div>
+        <div class="testi-slide">
+          <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-txt">"El Dr. Ramírez es excelente. Me dio el diagnóstico correcto cuando otros doctores no pudieron."</p><div class="testi-author"><img src="https://i.pravatar.cc/100?img=8" alt="Patricia V."><div><div class="testi-aname">Patricia V.</div><div class="testi-arole">Paciente</div></div></div></div>
+          <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-txt">"Llevé a mis hijos al pediatra y la atención fue muy buena. Los niños se sintieron cómodos."</p><div class="testi-author"><img src="https://i.pravatar.cc/100?img=20" alt="Roberto F."><div><div class="testi-aname">Roberto F.</div><div class="testi-arole">Paciente</div></div></div></div>
+          <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-txt">"Las instalaciones son modernas y limpias. El personal muy amable y eficiente."</p><div class="testi-author"><img src="https://i.pravatar.cc/100?img=38" alt="Sofía L."><div><div class="testi-aname">Sofía L.</div><div class="testi-arole">Paciente</div></div></div></div>
+          <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-txt">"Reservé mi cita por internet en minutos. El sistema es muy fácil y el servicio excelente."</p><div class="testi-author"><img src="https://i.pravatar.cc/100?img=42" alt="Miguel H."><div><div class="testi-aname">Miguel H.</div><div class="testi-arole">Paciente</div></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-ctrl">
+      <button class="testi-arrow" onclick="prevTesti()">‹</button>
+      <div class="testi-dots"><button class="testi-dot active" onclick="goTesti(0)"></button><button class="testi-dot" onclick="goTesti(1)"></button></div>
+      <button class="testi-arrow" onclick="nextTesti()">›</button>
+    </div>
+  </div>
+</section>
+
+<!-- EMERGENCIAS -->
+<div class="emergencias">
+  <div class="emer-in">
+    <div class="emer-left">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div class="emer-copy"><h3>Emergencias 24/7</h3><p>Estamos siempre listos para cuidar de ti y tu familia</p></div>
+    </div>
+    <div class="emer-phone">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.49 12 19.79 19.79 0 0 1 1.43 3.4a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 7 7l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span>(01) 612 5555</span>
+    </div>
+    <div class="emer-btns">
+      <a href="tel:+51016125555" class="btn-llamar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.49 12 19.79 19.79 0 0 1 1.43 3.4a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 7 7l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Llamar ahora
+      </a>
+      <a href="https://wa.me/51016125555" target="_blank" class="btn-wa">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Escríbenos por WhatsApp
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer" id="contacto">
+  <div class="footer-grid">
+    <div>
+      <div class="f-logo">
+        <div class="f-logo-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+        <div class="f-logo-txt"><span class="sub">Clínica</span><span class="main">MedPrime Lima</span></div>
+      </div>
+      <p class="f-desc">Tu salud es nuestra misión. Brindamos atención médica de calidad con tecnología de vanguardia y profesionales comprometidos contigo.</p>
+      <div class="f-social">
+        <a href="#" title="Facebook"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+        <a href="#" title="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+        <a href="#" title="YouTube"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg></a>
+        <a href="#" title="LinkedIn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      </div>
+    </div>
+    <div class="f-col">
+      <h4>Enlaces rápidos</h4>
+      <ul><li><a href="#especialidades">Especialidades</a></li><li><a href="#medicos">Médicos</a></li><li><a href="#sedes">Sedes</a></li><li><a href="#nosotros">Nosotros</a></li><li><a href="#blog">Blog</a></li></ul>
+    </div>
+    <div class="f-col">
+      <h4>Servicios</h4>
+      <ul><li><a href="#">Emergencias 24/7</a></li><li><a href="#">Resultados de exámenes</a></li><li><a href="#">Chequeos médicos</a></li><li><a href="#">Cirugías</a></li><li><a href="#">Telemedicina</a></li></ul>
+    </div>
+    <div class="f-col" id="nosotros">
+      <h4>Contacto</h4>
+      <div class="f-contact">
+        <div class="f-contact-row"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.49 12 19.79 19.79 0 0 1 1.43 3.4a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 7 7l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>(01) 612 5555</div>
+        <div class="f-contact-row"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>informes@medprimelima.pe</div>
+        <div class="f-contact-row"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Av. Larco 1234, Miraflores, Lima, Perú</div>
+      </div>
+    </div>
+    <div class="f-col">
+      <h4>Horario de atención</h4>
+      <div class="f-hours">
+        <div class="f-hour"><strong>Lunes a Viernes</strong><span>7:00 am - 9:00 pm</span></div>
+        <div class="f-hour"><strong>Sábados</strong><span>8:00 am - 2:00 pm</span></div>
+        <div class="f-hour"><strong>Domingos y Feriados</strong><span>Emergencias 24/7</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Clínica MedPrime Lima. Todos los derechos reservados.</p>
+    <div class="footer-bottom-links"><a href="#">Política de Privacidad</a><a href="#">Términos y Condiciones</a></div>
+  </div>
+</footer>
+
+<!-- FAB WhatsApp con ícono real -->
+<a href="https://wa.me/51016125555" class="fab" target="_blank" title="WhatsApp">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const TOKEN = '07c2538f6ade43835c5343012a503a20781827773637b52152de445f4ac4d326';
+
+  /* CLIMA */
+  async function loadWeather() {
+    try {
+      const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-12.0464&longitude=-77.0428&current=temperature_2m,weather_code&timezone=America%2FLima');
+      const j = await r.json();
+      const temp = Math.round(j.current.temperature_2m), code = j.current.weather_code;
+      document.getElementById('w-icon').textContent = wIco(code);
+      document.getElementById('w-temp').textContent = `Hoy en Lima ${temp}°C`;
+      document.getElementById('w-desc').textContent = ` — ${wDesc(code, temp)}`;
+    } catch { document.getElementById('w-desc').textContent = ' — Lima, Perú'; }
+  }
+  function wIco(c) { return c===0?'☀️':c<=2?'⛅':c<=49?'🌥️':c<=67?'🌧️':'🌩️'; }
+  function wDesc(c, t) {
+    if (c===0) return t>20?'Un día perfecto para tu chequeo médico':'Buen día para cuidar tu salud';
+    if (c<=3)  return 'Cielo parcialmente nublado en Lima';
+    if (c<=49) return 'Día nublado, ideal para tu consulta';
+    if (c<=67) return 'Día de lluvia — te esperamos en clínica';
+    return 'Cuídate del frío, visítanos';
+  }
+
+  /* DNI — se llena primero, nombre es automático */
+  let dniT;
+  function onDNI(v) {
+    clearTimeout(dniT);
+    const clean = v.replace(/\D/g,'').slice(0,8);
+    if (clean !== v) document.getElementById('dni').value = clean;
+    const st = document.getElementById('dni-st'), ok = document.getElementById('dni-ok');
+    const nom = document.getElementById('nombre');
+    if (clean.length < 8) {
+      st.textContent=''; st.className='dni-st';
+      ok.classList.remove('show');
+      nom.value=''; nom.placeholder='Se completa automáticamente con tu DNI';
+      return;
+    }
+    st.textContent='…'; st.className='dni-st';
+    dniT = setTimeout(()=>fetchDNI(clean), 450);
+  }
+  async function fetchDNI(dni) {
+    const st=document.getElementById('dni-st'), ok=document.getElementById('dni-ok'), nom=document.getElementById('nombre');
+    try {
+      const r = await fetch(`https://apiperu.dev/api/dni/${dni}`,{headers:{'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json'}});
+      const j = await r.json(), d = j.data||j;
+      const name = d.nombre_completo||d.nombre||`${d.nombres||''} ${d.apellido_paterno||''} ${d.apellido_materno||''}`.trim();
+      if (name && name.length > 3) {
+        nom.value=name; st.textContent='✓'; st.className='dni-st ok'; ok.classList.add('show');
+      } else {
+        nom.value=''; st.textContent='✗'; st.className='dni-st err'; ok.classList.remove('show');
+      }
+    } catch { st.textContent='✗'; st.className='dni-st err'; }
+  }
+
+  /* FORM */
+  function handleSubmit(e) {
+    e.preventDefault();
+    const n=document.getElementById('nombre').value, esp=document.getElementById('especialidad').value,
+          f=document.getElementById('fecha').value, h=document.getElementById('hora').value, s=document.getElementById('sede').value;
+    if(!n){alert('Por favor ingresa tu DNI para autocompletar tu nombre.');return;}
+    if(!esp||!h){alert('Por favor completa todos los campos.');return;}
+    alert(`✅ ¡Cita registrada!\n\nPaciente: ${n}\nEspecialidad: ${esp}\nFecha: ${f} a las ${h}\nSede: ${s}\n\nNos comunicaremos contigo para confirmar tu cita.`);
+  }
+  document.getElementById('fecha').min = new Date().toISOString().split('T')[0];
+
+  /* MAPA */
+  const SEDES=[
+    {name:'Sede Miraflores',lat:-12.1219,lng:-77.0282,addr:'Av. Larco 1234, Miraflores'},
+    {name:'Sede San Isidro',lat:-12.0996,lng:-77.0353,addr:'Av. Javier Prado Este 2345'},
+    {name:'Sede La Molina', lat:-12.0833,lng:-76.9500,addr:'Av. La Molina 5678'},
+  ];
+  const map=L.map('map').setView([-12.1,-77.01],12);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap, © CARTO',maxZoom:18}).addTo(map);
+  const pin=L.divIcon({html:'<div style="width:22px;height:22px;background:#16A34A;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25)"></div>',iconSize:[22,22],iconAnchor:[11,22],className:''});
+  const markers=SEDES.map(s=>{const m=L.marker([s.lat,s.lng],{icon:pin}).addTo(map);m.bindPopup(`<strong>${s.name}</strong><br>${s.addr}`);return m;});
+  function focusSede(i){document.querySelectorAll('.sede-card').forEach((c,j)=>c.classList.toggle('active',j===i));map.setView([SEDES[i].lat,SEDES[i].lng],15,{animate:true});markers[i].openPopup();}
+
+  /* CAROUSEL */
+  let ti=0;
+  const track=document.getElementById('testi-track'), dots=document.querySelectorAll('.testi-dot');
+  function goTesti(i){ti=i;track.style.transform=`translateX(-${i*100}%)`;dots.forEach((d,j)=>d.classList.toggle('active',j===i));}
+  function nextTesti(){goTesti((ti+1)%2);}
+  function prevTesti(){goTesti((ti-1+2)%2);}
+  setInterval(nextTesti,6000);
+
+  loadWeather();
+</script>
+</body>
+</html>

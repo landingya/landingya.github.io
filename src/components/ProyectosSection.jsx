@@ -36,12 +36,14 @@ const proyectos = [
     tags: ['Fitness', 'Membresías', 'App'],
   },
   {
-    nombre: 'Clínica Salud+',
-    tipo: 'Landing Page',
-    desc: 'Presencia digital para clínica privada en San Isidro. Citas online, especialidades y portal de pacientes.',
+    nombre: 'MedPrime Lima — Clínica Privada',
+    tipo: 'Landing Salud',
+    desc: 'Landing para clínica privada con widget de clima Lima, agendamiento de citas con verificación DNI vía RENIEC, mapa de sedes y equipo médico.',
     color: 'from-teal-500 to-cyan-600',
     grad: 'linear-gradient(135deg, #14b8a6, #0891b2)',
-    tags: ['Salud', 'Citas', 'Corporativo'],
+    tags: ['Salud', 'DNI API', 'Demo en vivo'],
+    href: '/demos/salud/',
+    img: '/salud-preview.jpg',
   },
   {
     nombre: 'ArtesaníaPerú',

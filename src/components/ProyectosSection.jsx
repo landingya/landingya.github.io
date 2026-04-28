@@ -12,30 +12,6 @@ const proyectos = [
     img: '/ucf-preview.jpg',
   },
   {
-    nombre: 'Cevichería El Muelle',
-    tipo: 'Landing Page',
-    desc: 'Landing premium para restaurante de mariscos en Miraflores. Reservas online, menú animado y galería de platos.',
-    color: 'from-cyan-500 to-blue-600',
-    grad: 'linear-gradient(135deg, #06b6d4, #2563eb)',
-    tags: ['Restaurante', 'Reservas', 'Lima'],
-  },
-  {
-    nombre: 'AndesInmobiliaria',
-    tipo: 'Sistema Web',
-    desc: 'Plataforma de gestión de propiedades para inmobiliaria con más de 200 inmuebles en Lima y provincias.',
-    color: 'from-purple-500 to-indigo-600',
-    grad: 'linear-gradient(135deg, #8b5cf6, #4f46e5)',
-    tags: ['Inmobiliaria', 'Dashboard', 'CRM'],
-  },
-  {
-    nombre: 'FitnessPro Perú',
-    tipo: 'Landing + App',
-    desc: 'Landing y app web para cadena de gimnasios. Registro de miembros, clases online y seguimiento de rutinas.',
-    color: 'from-orange-500 to-pink-600',
-    grad: 'linear-gradient(135deg, #f97316, #db2777)',
-    tags: ['Fitness', 'Membresías', 'App'],
-  },
-  {
     nombre: 'MedPrime Lima — Clínica Privada',
     tipo: 'Landing Salud',
     desc: 'Landing para clínica privada con widget de clima Lima, agendamiento de citas con verificación DNI vía RENIEC, mapa de sedes y equipo médico.',
@@ -44,22 +20,6 @@ const proyectos = [
     tags: ['Salud', 'DNI API', 'Demo en vivo'],
     href: '/demos/salud/',
     img: '/salud-preview.jpg',
-  },
-  {
-    nombre: 'ArtesaníaPerú',
-    tipo: 'E-commerce',
-    desc: 'Tienda online de artesanías y textiles peruanos con envíos internacionales. Catálogo de 500+ productos.',
-    color: 'from-amber-500 to-orange-600',
-    grad: 'linear-gradient(135deg, #f59e0b, #ea580c)',
-    tags: ['E-commerce', 'Exportación', 'Cultura'],
-  },
-  {
-    nombre: 'LegalMind Estudio',
-    tipo: 'Landing Page',
-    desc: 'Landing corporativa para estudio de abogados especializado en derecho empresarial y comercio exterior.',
-    color: 'from-slate-500 to-blue-700',
-    grad: 'linear-gradient(135deg, #64748b, #1d4ed8)',
-    tags: ['Legal', 'Corporativo', 'B2B'],
   },
 ]
 
